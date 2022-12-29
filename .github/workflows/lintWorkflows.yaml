@@ -3,6 +3,8 @@ name: lintWorkflows
 on:
    push:
    pull_request:
+    types:
+      - "opened"
    workflow_dispatch:
 
 jobs:
