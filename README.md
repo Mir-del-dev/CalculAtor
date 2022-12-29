@@ -76,4 +76,4 @@ This application uses the default go test integration.
 ok      calculator/internals/math   0.002s
 ```
 mon projet de devops
-mon projeet de master 1
+mon projet
