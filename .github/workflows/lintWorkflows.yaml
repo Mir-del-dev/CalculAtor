@@ -3,6 +3,7 @@ name: lintWorkflows
 on:
    push:
    pull_request:
+   workflow_dispatch:
 
 jobs:
   semgrep:
@@ -10,9 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-    container: # Use a container
+    container:
       image: returntocorp/semgrep:1.1.0
-    # don't execute this workflow for dependabot pr
     if: (github.actor != 'dependabot[bot]')
     steps:
       - name: "Checkout source"
@@ -21,6 +21,21 @@ jobs:
       - name: "Execute semgrep"
         run: semgrep ci --sarif --output=semgrep.sarif
         env:
-          # Specify the ruleset to use
           SEMGREP_RULES: p/default
+  hadolint:
+    name: "Hadolint scan"
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    # don't execute this workflow for dependabot pr
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v3
 
+      - name: "Run hadolint"
+        uses: hadolint/hadolint-action@v2.1.0
+        with:
+          dockerfile: Dockerfile
+          format: sarif
+          output-file: hadolint-results.sarif
