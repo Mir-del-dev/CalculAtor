@@ -10,19 +10,19 @@ jobs:
         go-version: ['1.17','1.18','1.19']
 
     steps:
-      -
-        name: Checkout
+      
+      - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      -
-        name: Set up Go ${{matrix.go-version}}
+      
+      - name: Set up Go ${{matrix.go-version}}
         uses: actions/setup-go@v3
         with:
           go-version: ${{matrix.go-version}}
-      -
-        name: build
+      
+      - name: build
         run: go build ./...
-      -
-        name: test ${{matrix.go-version}}
+      
+      - name: test ${{matrix.go-version}}
         run: go test ./...
