@@ -27,7 +27,7 @@ jobs:
         with:
           sarif_file: semgrep.sarif
         if: always()
-            
+
   hadolint:
     name: "Hadolint scan"
     runs-on: ubuntu-latest
@@ -52,3 +52,20 @@ jobs:
         with:
           sarif_file: hadolint-results.sarif
           wait-for-processing: true
+
+    
+  lint:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.opened == true
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 'Lint Code Base'
+        uses: github/super-linter/slim@v4
+        env:
+          VALIDATE_ALL_CODEBASE: false # disabled so that the scan is faster
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # needed to get access to PR
