@@ -36,6 +36,6 @@ jobs:
       - name: "Run hadolint"
         uses: hadolint/hadolint-action@v2.1.0
         with:
-          dockerfile: Dockerfile
+          dockerfile: ./Dockerfile
           format: sarif
           output-file: hadolint-results.sarif
