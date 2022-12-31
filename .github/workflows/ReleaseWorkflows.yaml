@@ -14,10 +14,12 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Set up Go
+      - name: Set up Go # ici,on prépare l'environnement pour go
+
         uses: actions/setup-go@v3
       
-      - name: Run GoReleaser
+      - name: Run GoReleaser # ici,on compile le projet avec goreleaser
+
         uses: goreleaser/goreleaser-action@v4
         with:
           version: latest
@@ -25,7 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: publication sur docker hub
+      - name: publication sur docker hub # connexion au docker hub afin de créer et publier l'image du projet
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: sofeu/calculator

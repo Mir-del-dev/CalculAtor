@@ -5,10 +5,10 @@ on:
    pull_request:
     types:
       - "opened"
+    branches: [master]
    workflow_dispatch:
-
 jobs:
-  semgrep:
+  semgrep: # Job semgrep pour l'analyse statistique
     name: Semgrep
     runs-on: ubuntu-latest
     permissions:
@@ -20,34 +20,35 @@ jobs:
       - name: "Checkout source"
         uses: actions/checkout@v3
       
-      - name: "Execute semgrep"
+      - name: "Execute semgrep" # exécution de semgrep en utilisant les paramètres par défaut 
+
         run: semgrep ci --sarif --output=semgrep.sarif
         env:
-          SEMGREP_RULES: p/default
+          SEMGREP_RULES: p/default # Envoi de l'analyse effectué sur GitHub pour une potentielle analyse de code par codeql 
       - name: "Upload SARIF file for GitHub CodeQL"
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: semgrep.sarif
         if: always()
 
-  hadolint:
+  hadolint: # job hadolint pour l'analyse du dockerfile
     name: "Hadolint scan"
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-    # don't execute this workflow for dependabot pr
+    # on n'exécute pas ce workflow pour dependabot
     if: (github.actor != 'dependabot[bot]')
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v3
-
+    # exécution de hadolint en précisant les paramètres tel que l'emplacement du docker file ,le format de sorti de l'analyse et le fichier de sortie
       - name: "Run hadolint"
         uses: hadolint/hadolint-action@v2.1.0
         with:
           dockerfile: ./Dockerfile
           format: sarif
           output-file: hadolint-results.sarif
-
+    # Envoi de l'analyse sur GitHub a la fin de l'analyse
       - name: "Upload analysis results to GitHub"
         uses: github/codeql-action/upload-sarif@v2
         if: always()
@@ -56,9 +57,11 @@ jobs:
           wait-for-processing: true
 
     
-  lint:
+  lint: # job lint pour analyse du code source
+
     name: Lint Code Base
     runs-on: ubuntu-latest
+    # commande if pour exécuter ce job que si le pull request vers la branche principal ( master) est ouvert
     if: github.event.pull_request.opened == true
     steps:
       - name: Checkout Code
@@ -69,5 +72,6 @@ jobs:
       - name: 'Lint Code Base'
         uses: github/super-linter/slim@v4
         env:
-          VALIDATE_ALL_CODEBASE: false # disabled so that the scan is faster
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # needed to get access to PR
+          VALIDATE_ALL_CODEBASE: false # désactivation du paramètre validate_all_codebase pour permettre une exécution rapide du scan du code
+
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # on récupère le token afin d'avoir accès au pull_request
